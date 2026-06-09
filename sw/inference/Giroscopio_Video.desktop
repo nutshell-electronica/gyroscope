@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Giroscopio 12KP (+ Video)
+Comment=Lanza el sistema de detección Edge AI con grabación de vídeo automática
+Icon=video-display
+Exec=env DISPLAY=:0 XAUTHORITY=/home/ai/.Xauthority lxterminal --title="Giroscopio 12KP + Video" -e /home/ai/giroscopio/giro_scripts/lanzar_giroscopio_video.sh
+Terminal=false
+Categories=Education;Science;

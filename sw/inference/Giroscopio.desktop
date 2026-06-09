@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Giroscopio 12KP
+Comment=Lanza el sistema de detección Edge AI del giroscopio
+# Icono estándar disponible en Raspberry Pi OS:
+Icon=camera-video
+# lxterminal es el terminal por defecto en Raspberry Pi OS Bookworm
+Exec=lxterminal --title="Giroscopio 12KP" -e /home/ai/giroscopio/lanzar_giroscopio.sh
+Terminal=false
+Categories=Education;Science;

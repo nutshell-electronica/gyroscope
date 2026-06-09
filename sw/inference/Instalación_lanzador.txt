@@ -1,0 +1,9 @@
+chmod +x /home/ai/giroscopio/lanzar_giroscopio.sh
+cp Giroscopio.desktop ~/Desktop/
+chmod +x ~/Desktop/Giroscopio.desktop
+
+# Clic derecho sobre el icono → "Allow Launching"
+
+# Paso 1 — Wrapper bash (/home/ai/giroscopio/lanzar_giroscopio.sh
+# Paso 2 — Archivo .desktop (/home/ai/Desktop/Giroscopio.desktop
+# Paso 3 — Instalación (ejecutar una vez desde terminal)

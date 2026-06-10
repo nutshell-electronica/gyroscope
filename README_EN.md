@@ -27,6 +27,8 @@ is **replicable by vocational students** using free tools.
 
 > 🌐 [Versión en español → README.md](README.md)
 
+![Demo](assets/demo.gif)
+
 ---
 
 ## Demo
@@ -240,7 +242,7 @@ comparable to the teacher's model, validating that the pipeline is **reproducibl
 
 ## Previous Version
 
-The original version of the project (8-keypoint model, first pipeline) is available
+The original version of the project (9-keypoint model, first pipeline) is available
 as [Release v1.0](https://github.com/nutshell-electronica/gyroscope/releases/tag/v1.0).
 
 ---

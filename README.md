@@ -1,31 +1,31 @@
 # Gyroscope Edge AI — YOLOv8n-Pose + Hailo-8 on Raspberry Pi 5
 
-**Real-time orientation detection of a mechanical gyroscope using 12 custom keypoints,
-running entirely on-device on a Raspberry Pi 5 with a Hailo-8 NPU — no cloud, no GPU.**
+**Detección en tiempo real de la orientación de un giroscopio mecánico mediante 12 keypoints
+personalizados, ejecutado íntegramente en una Raspberry Pi 5 con NPU Hailo-8 — sin nube, sin GPU.**
 
-> Educational innovation project MTT-041/25 · IES Politécnico Jesús Marín, Málaga (Spain)  
-> Higher Vocational Training in Electronic Maintenance · Drone Maintenance Specialisation  
-> Author: José Luis Guerrero Marín · June 2026
+> Proyecto de innovación educativa MTT-041/25 · IES Politécnico Jesús Marín, Málaga  
+> CFGS Mantenimiento Electrónico · Curso de Especialización en Mantenimiento de Drones  
+> Autor: José Luis Guerrero Marín · Junio 2026
 
 ---
 
-## What is this?
+## ¿Qué es esto?
 
-A computer vision system that detects a physical drone gyroscope and estimates its
-orientation angles (Roll, Pitch, Yaw) in real time. A custom YOLOv8n-Pose model detects
-12 keypoints distributed across three structural groups of the gyroscope, and computes
-3D orientation from their 2D coordinates.
+Un sistema de visión artificial que detecta un giroscopio mecánico de dron y estima sus
+ángulos de orientación (Roll, Pitch, Yaw) en tiempo real. El modelo YOLOv8n-Pose detecta
+12 keypoints personalizados distribuidos en tres grupos estructurales del giroscopio, y a
+partir de sus coordenadas 2D calcula la orientación tridimensional.
 
-The entire pipeline — capture, inference, computation, and display — runs on a
-**Raspberry Pi 5 with AI HAT+ (Hailo-8 chip, 26 TOPS)** with no internet connection and
-no external GPU, at ~22 FPS with the production model.
+Todo el pipeline —captura, inferencia, cálculo y visualización— corre en una
+**Raspberry Pi 5 con AI HAT+ (chip Hailo-8, 26 TOPS)** sin conexión a internet ni GPU externa,
+a ~22 FPS con el modelo de producción.
 
-The project has two goals: to serve as a **real hands-on teaching platform** for electronics
-students, and to demonstrate that the full Edge AI pipeline
-(dataset → labelling → training → compilation → embedded inference)
-is **replicable by vocational students** using free tools.
+El proyecto tiene un doble objetivo: ser un **banco de trabajo didáctico real** para alumnos
+de electrónica, y demostrar que el pipeline completo de Edge AI
+(dataset → etiquetado → entrenamiento → compilación → inferencia embebida)
+es **replicable por estudiantes de FP** con herramientas gratuitas.
 
-> 🌐 [Versión en español → README.md](README.md)
+> 🌐 [English version → README_EN.md](README_EN.md)
 
 ![Demo](assets/demo.gif)
 
@@ -33,224 +33,224 @@ is **replicable by vocational students** using free tools.
 
 ## Demo
 
-> 🎬 *Presentation video — coming soon*
+> 🎬 *Vídeo de presentación — próximamente*
 
-📖 Project blog (Spanish):
+📖 Blog del proyecto:
 [blogsaverroes.juntadeandalucia.es/industria4](https://blogsaverroes.juntadeandalucia.es/industria4/2026/03/15/deteccion-de-orientacion-de-giroscopio-para-drones/)
 
 ---
 
-## Full Pipeline
+## Pipeline completo
 
-| Step | Tool | What happens |
-|------|------|-------------|
-| 1. Record dataset | `grabar_dataset_v2.py` + RPi Cam v2 | Video of gyroscope in varied positions; frame extraction |
-| 2. Label | [Roboflow](https://roboflow.com) | 12 keypoints per image; allowed augmentations: noise and blur (flips **forbidden**) |
-| 3. Train | `giroscopio_colab_v4.ipynb` (Google Colab, free T4 GPU) | YOLOv8n-Pose, 150 epochs, ONNX export |
-| 4. Compile HEF | Docker + Hailo DFC 3.33.0 (Ubuntu or Windows) | ONNX → HEF (Hailo-8 native format); ~22 min compile time |
-| 5. Infer | `giroscopio_12kp_v3h.py` on RPi 5 | ~22 FPS · visual panel with arcs, pendulum and compass · automatic logs |
-
----
-
-## Results
-
-| Model | Raw images | mAP50-95(P) | Mean conf (RPi) | Status |
-|-------|-----------|-------------|-----------------|--------|
-| p113 | 113 | 0.130 | ~0.636 | Compiled, not production-ready |
-| p211 | 211 | 0.716 | — | Compiled ✓ |
-| p309 | 309 | 0.748 | 0.636 | Compiled ✓, tested ✓ |
-| **p410** | **410** | **0.764** | **0.888** | **PRODUCTION — 0 lost frames, 99.5% frames >0.5 conf** |
-| a100 *(student)* | 100 | 0.130 | 0.737 | Compiled ✓, tested ✓ |
-
-**Key finding:** The critical performance jump is between 113 and 211 images (+0.586 mAP).
-Beyond 211, the curve flattens — background variety matters more than image volume.
-
-**Documented geometric limitation:**
-
-| Axis | Reliability | Reason |
-|------|------------|--------|
-| Pitch | ✅ Reliable | Side view: octagon plane angle changes unambiguously |
-| Roll | ⚠️ Partial | Side view: indistinguishable from depth change |
-| Yaw | ❌ Not working | Geometrically impossible with a single lateral camera |
-
-This limitation is formally documented and conceptually resolved in the main document
-(second camera or IMU MPU-6050 fusion).
+| Paso | Herramienta | Qué se hace |
+|------|-------------|-------------|
+| 1. Grabar dataset | `grabar_dataset_v2.py` + RPi Cam v2 | Vídeo del giroscopio en posiciones variadas; extracción de frames |
+| 2. Etiquetar | [Roboflow](https://roboflow.com) | 12 keypoints por imagen; augmentaciones permitidas: ruido y blur (flips **prohibidos**) |
+| 3. Entrenar | `giroscopio_colab_v4.ipynb` (Google Colab, GPU T4 gratuita) | YOLOv8n-Pose, 150 épocas, exportación a ONNX |
+| 4. Compilar HEF | Docker + Hailo DFC 3.33.0 (Ubuntu o Windows) | ONNX → HEF (formato nativo del chip Hailo-8); ~22 min de compilación |
+| 5. Inferir | `giroscopio_12kp_v3h.py` en RPi 5 | ~22 FPS · panel visual con arcos, péndulo y brújula · logs automáticos |
 
 ---
 
-## Repository Structure
+## Resultados
+
+| Modelo | Imágenes raw | mAP50-95(P) | Conf. media (RPi) | Estado |
+|--------|-------------|-------------|-------------------|--------|
+| p113 | 113 | 0.130 | ~0.636 | Compilado, no apto producción |
+| p211 | 211 | 0.716 | — | Compilado ✓ |
+| p309 | 309 | 0.748 | 0.636 | Compilado ✓, probado ✓ |
+| **p410** | **410** | **0.764** | **0.888** | **PRODUCCIÓN — 0 pérdidas, 99.5% frames >0.5 conf** |
+| a100 *(alumno)* | 100 | 0.130 | 0.737 | Compilado ✓, probado ✓ |
+
+**Conclusión:** El salto crítico de rendimiento está entre 113 y 211 imágenes (+0.586 mAP).
+A partir de 211 la curva se aplana — la variedad de fondo importa más que el volumen de imágenes.
+
+**Limitación geométrica documentada:**
+
+| Eje | Fiabilidad | Motivo |
+|-----|-----------|--------|
+| Pitch | ✅ Fiable | Vista lateral: el plano del octógono cambia sin ambigüedad |
+| Roll | ⚠️ Parcial | Vista lateral: indistinguible de cambio en profundidad |
+| Yaw | ❌ No funciona | Geométricamente imposible con cámara lateral única |
+
+Esta limitación está documentada y resuelta conceptualmente en el documento principal
+(segunda cámara o fusión con IMU MPU-6050).
+
+---
+
+## Estructura del repositorio
 
 ```
 gyroscope/
 │
-├── README.md                                      # Spanish version
-├── README_EN.md                                   # This file
+├── README.md
+├── README_EN.md
 ├── LICENSE
 │
 ├── docs/
-│   ├── Proyecto_Giroscopio_12KP_Hailo8_v8.pdf   # Full document (112 pp): hardware,
-│   │                                              # pipeline, bugs, results, pedagogy
-│   ├── tutorial_hailo8_ubuntu.pdf                # ONNX→HEF compilation on Ubuntu with Docker
-│   ├── tutorial_hailo8_windows.pdf               # ONNX→HEF compilation on Windows with Docker
-│   └── etiquetas_keypoints.pdf                   # Printable 12-KP reference with colours
+│   ├── Proyecto_Giroscopio_12KP_Hailo8_v8.pdf   # Documento completo (112 pág): hardware,
+│   │                                              # pipeline, bugs, resultados, pedagogía
+│   ├── tutorial_hailo8_ubuntu.pdf                # Compilación ONNX→HEF en Ubuntu con Docker
+│   ├── tutorial_hailo8_windows.pdf               # Compilación ONNX→HEF en Windows con Docker
+│   └── etiquetas_keypoints.pdf                   # Referencia imprimible de los 12 KPs con colores
 │
 ├── sw/
 │   ├── inference/
-│   │   ├── giroscopio_12kp_v3h.py                # Main inference script (production)
-│   │   ├── lanzar_giroscopio.sh                  # Bash wrapper — launch without recording
-│   │   ├── lanzar_giroscopio_video.sh            # Bash wrapper — launch with auto video recording
-│   │   ├── Giroscopio.desktop                    # Desktop icon → lanzar_giroscopio.sh
-│   │   ├── Giroscopio_Video.desktop              # Desktop icon → lanzar_giroscopio_video.sh
-│   │   └── Instalacion_lanzador.txt              # Launcher installation instructions
+│   │   ├── giroscopio_12kp_v3h.py                # Script principal de inferencia (producción)
+│   │   ├── lanzar_giroscopio.sh                  # Wrapper bash — lanzador sin grabación
+│   │   ├── lanzar_giroscopio_video.sh            # Wrapper bash — lanzador con grabación automática
+│   │   ├── Giroscopio.desktop                    # Icono de escritorio → lanzar_giroscopio.sh
+│   │   ├── Giroscopio_Video.desktop              # Icono de escritorio → lanzar_giroscopio_video.sh
+│   │   └── Instalacion_lanzador.txt              # Instrucciones de instalación de los lanzadores
 │   ├── dataset/
-│   │   └── grabar_dataset_v2.py                  # Video recording and frame extraction
+│   │   └── grabar_dataset_v2.py                  # Grabación de vídeo y extracción de frames
 │   └── training/
-│       └── giroscopio_colab_v4.ipynb             # Google Colab notebook — YOLOv8n-Pose training
+│       └── giroscopio_colab_v4.ipynb             # Notebook Google Colab — entrenamiento YOLOv8n-Pose
 │
 ├── hailo/
-│   └── giroscopio.alls                           # Hailo DFC quantisation script (reference)
+│   └── giroscopio.alls                           # Script de cuantización para Hailo DFC (referencia)
 │
-├── 3d/                                           # 3D printable files (RPi and camera mounts)
+├── 3d/                                           # Archivos para impresión 3D (soportes RPi y cámara)
 │
-└── assets/                                       # Images and GIF for documentation
+└── assets/                                       # Imágenes y GIF para documentación
 ```
 
 ---
 
-## Quick Start
+## Inicio rápido
 
-### Prerequisites
+### Prerrequisitos
 
-- Raspberry Pi 5 (4 or 8 GB) with Raspberry Pi AI HAT+ (Hailo-8 chip)
+- Raspberry Pi 5 (4 u 8 GB) con Raspberry Pi AI HAT+ (chip Hailo-8)
 - Raspberry Pi Camera Module v2
 - Raspberry Pi OS Bookworm (64-bit)
-- HailoRT 4.23.0 installed (`hailortcli fw-control identify` should respond)
-- Python 3 with `picamera2`, `opencv-python`, `numpy`
+- HailoRT 4.23.0 instalado (`hailortcli fw-control identify` debe responder)
+- Python 3 con `picamera2`, `opencv-python`, `numpy`
 
-### Installation
+### Instalación
 
 ```bash
-# 1. Clone the repository
+# 1. Clonar el repositorio
 git clone https://github.com/nutshell-electronica/gyroscope.git
 cd gyroscope
 
-# 2. Create folder structure on the RPi
+# 2. Crear estructura de carpetas en la RPi
 mkdir -p /home/$USER/giroscopio/giro_scripts
 mkdir -p /home/$USER/giroscopio/giroscopio_v3a/p410
 
-# 3. Copy scripts
+# 3. Copiar scripts
 cp sw/inference/* /home/$USER/giroscopio/giro_scripts/
 chmod +x /home/$USER/giroscopio/giro_scripts/*.sh
 
-# 4. Copy the compiled HEF model (see docs/tutorial_hailo8_ubuntu.pdf to compile it)
-# scp your_pc:/path/to/giroscopio.hef /home/$USER/giroscopio/giroscopio_v3a/p410/
+# 4. Copiar el modelo HEF compilado (ver docs/tutorial_hailo8_ubuntu.pdf para compilarlo)
+# scp tu_pc:/ruta/al/giroscopio.hef /home/$USER/giroscopio/giroscopio_v3a/p410/
 ```
 
-For desktop icon installation, see `sw/inference/Instalacion_lanzador.txt`.
+Para instalar los iconos de escritorio, consulta `sw/inference/Instalacion_lanzador.txt`.
 
-### Running
+### Ejecución
 
 ```bash
-# From terminal
+# Desde terminal
 cd /home/$USER/giroscopio/giro_scripts
 ./lanzar_giroscopio.sh
 
-# With automatic video recording
+# Con grabación de vídeo automática
 ./lanzar_giroscopio_video.sh
 
-# Directly with custom parameters
+# Directamente con parámetros personalizados
 python3 giroscopio_12kp_v3h.py \
     --hef /home/$USER/giroscopio/giroscopio_v3a/p410/giroscopio.hef \
     --dead-zone 6 \
     --iou-thresh 0.30
 ```
 
-### Configurable Parameters
+### Parámetros configurables
 
-| CLI parameter | Default | Description |
-|--------------|---------|-------------|
-| `--hef` | (see .sh wrapper) | Path to compiled HEF file |
-| `--dead-zone` | `6.0` | Dead zone in degrees (absorbs ±5–7° noise) |
-| `--iou-thresh` | `0.30` | IoU threshold for NMS (lower if double detections appear) |
-| `--log-dir` | `giro_historico_logs/` | Directory for session logs |
-| `--save-auto` | (disabled) | Directory for automatic video recording |
+| Parámetro CLI | Valor por defecto | Descripción |
+|--------------|-------------------|-------------|
+| `--hef` | (ver wrapper .sh) | Ruta al archivo HEF compilado |
+| `--dead-zone` | `6.0` | Zona muerta en grados (absorbe ruido de ±5-7°) |
+| `--iou-thresh` | `0.30` | Umbral IoU para NMS (bajar si hay detecciones dobles) |
+| `--log-dir` | `giro_historico_logs/` | Directorio para logs de sesión |
+| `--save-auto` | (desactivado) | Directorio para grabación automática de vídeo |
 
-> ⚠️ If the window does not appear when launching from the desktop icon (silent black screen),
-> see the launcher section of the main document — this is the Wayland/XAUTHORITY bug,
-> documented and resolved in `Instalacion_lanzador.txt`.
-
----
-
-## The 12 Keypoints
-
-| Group | KPs | Axis | Colour markers |
-|-------|-----|------|---------------|
-| OCT (octagon) | KP1–KP4 | Pitch | White, Black, Red, Yellow |
-| INT (U-support) | KP5–KP8 | Roll | Electric blue, Orange, Lime green, Magenta |
-| BASE (square base) | KP9–KP12 | Yaw | Cyan, Pink, Brown, Purple |
-
-See `docs/etiquetas_keypoints.pdf` for the printable reference with exact positions.
-
-> ⚠️ Horizontal and vertical flips are **forbidden** in Roboflow augmentations.
-> They reverse the keypoint label order of symmetric points and corrupt annotations.
+> ⚠️ Si al lanzar desde el icono de escritorio la ventana no aparece (pantalla negra sin error),
+> consulta la sección de lanzadores del documento principal — es el Bug Wayland/XAUTHORITY,
+> documentado y resuelto en `Instalacion_lanzador.txt`.
 
 ---
 
-## Full Documentation
+## Los 12 keypoints
 
-📄 **`docs/Proyecto_Giroscopio_12KP_Hailo8_v8.pdf`** — 112 pages covering:
+| Grupo | KPs | Eje | Marcadores de color |
+|-------|-----|-----|---------------------|
+| OCT (octógono) | KP1–KP4 | Pitch | Blanco, Negro, Rojo, Amarillo |
+| INT (soporte U) | KP5–KP8 | Roll | Azul eléctrico, Naranja, Verde lima, Magenta |
+| BASE (base cuadrada) | KP9–KP12 | Yaw | Cian, Rosa, Marrón, Morado |
 
-- Mechanical gyroscope design and fabrication
-- Computer vision system architecture
-- Full pipeline walkthrough with real screenshots
-- 17 bugs diagnosed and resolved during development
-- Comparison of all 5 trained models
-- Single-camera geometric limitation (formal analysis)
-- Physical test results with drones
-- Pedagogical reflection and future directions
-- Appendices: Colab notebook v4, Hailo compilation tutorial, annotated inference script
+Ver `docs/etiquetas_keypoints.pdf` para la referencia imprimible con posiciones exactas.
 
----
-
-## Hardware Setup
-
-| Component | Model |
-|-----------|-------|
-| Computer | Raspberry Pi 5 (8 GB RAM) |
-| AI accelerator | Raspberry Pi AI HAT+ (Hailo-8, 26 TOPS, PCIe) |
-| Camera | Raspberry Pi Camera Module v2 (IMX219, RGB888, 960×540) |
-| Monitor | MSI 24.5" 120 Hz |
-| Keyboard | Logitech K400 wireless |
-| Mounts | 3D-printed VESA and camera mounts (see `3d/`) |
-| Gyroscope | Commercial 3-axis model with 12 colour markers |
+> ⚠️ Los flips horizontales y verticales están **prohibidos** en las augmentaciones de Roboflow.
+> Invierten el orden de los keypoints simétricos y corrompen las etiquetas.
 
 ---
 
-## Educational Context
+## Documentación completa
 
-This project is part of the **Teaching Materials Project MTT-041/25**,
-funded by the Andalusian Regional Government (Junta de Andalucía) with an 800 € grant.
+📄 **`docs/Proyecto_Giroscopio_12KP_Hailo8_v8.pdf`** — 112 páginas que cubren:
 
-**Participants:** 3 groups of Higher Vocational Training students in Electronic Maintenance
-(4 students/group) at IES Politécnico Jesús Marín (Málaga, Spain).
-Each group recorded their own dataset, labelled it in Roboflow, and trained their model in Google Colab.
-
-One student completed the process independently (model a100) and achieved results
-comparable to the teacher's model, validating that the pipeline is **reproducible without direct supervision**.
-
----
-
-## Previous Version
-
-The original version of the project (9-keypoint model, first pipeline) is available
-as [Release v1.0](https://github.com/nutshell-electronica/gyroscope/releases/tag/v1.0).
+- Diseño y fabricación del giroscopio mecánico
+- Arquitectura del sistema de visión artificial
+- Pipeline completo paso a paso con capturas reales
+- 17 bugs diagnosticados y resueltos durante el desarrollo
+- Comparativa de los 5 modelos entrenados
+- Limitación geométrica de cámara única (análisis formal)
+- Resultados de pruebas físicas con drones
+- Reflexión pedagógica y líneas futuras
+- Anexos: notebook Colab v4, tutorial Hailo compilación, script de inferencia anotado
 
 ---
 
-## License
+## Hardware del puesto de trabajo
 
-See [LICENSE](LICENSE).
+| Componente | Modelo |
+|-----------|--------|
+| Computador | Raspberry Pi 5 (8 GB RAM) |
+| Acelerador IA | Raspberry Pi AI HAT+ (Hailo-8, 26 TOPS, PCIe) |
+| Cámara | Raspberry Pi Camera Module v2 (IMX219, RGB888, 960×540) |
+| Monitor | MSI 24,5" 120 Hz |
+| Teclado | Logitech K400 inalámbrico |
+| Soportes | VESA y cámara impresos en 3D (ver `3d/`) |
+| Giroscopio | Modelo comercial ampliado de 3 ejes con 12 marcadores de color |
 
 ---
 
-*IES Politécnico Jesús Marín · Department of Electrical & Electronic Engineering · Málaga · 2026*
+## Contexto educativo
+
+Este proyecto forma parte del **Proyecto de Elaboración de Materiales MTT-041/25**,
+concedido por la Consejería de Educación de la Junta de Andalucía con una dotación de 800 €.
+
+**Participantes:** 3 grupos de alumnos de CFGS Mantenimiento Electrónico
+(4 alumnos/grupo) del IES Politécnico Jesús Marín (Málaga).
+Cada grupo grabó su propio dataset, etiquetó en Roboflow y entrenó su modelo en Google Colab.
+
+Un alumno completó el proceso de forma independiente (modelo a100) y obtuvo resultados
+comparables al modelo del profesor, validando que el proceso es **reproducible sin supervisión directa**.
+
+---
+
+## Versión anterior del repositorio
+
+La versión original del proyecto (modelo de 9 keypoints, primer pipeline) está disponible
+como [Release v1.0](https://github.com/nutshell-electronica/gyroscope/releases/tag/v1.0).
+
+---
+
+## Licencia
+
+Ver [LICENSE](LICENSE).
+
+---
+
+*IES Politécnico Jesús Marín · Departamento de Electricidad y Electrónica · Málaga · 2026*
